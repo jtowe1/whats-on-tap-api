@@ -6,7 +6,7 @@ import (
 )
 
 func (app *application) logError(r *http.Request, err error) {
-	fmt.Printf("request_method: %s\nrequest_url: %s\nerror: %s", r.Method, r.URL.String(), err)
+	fmt.Printf("\n\nrequest_method: %s\nrequest_url: %s\nerror: %s", r.Method, r.URL.String(), err)
 }
 
 func (app *application) errorResponse(w http.ResponseWriter, r *http.Request, status int, message any) {
