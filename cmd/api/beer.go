@@ -1,10 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
+	"github.com/jtowe1/whats-on-tap-api/internal/data"
 	"github.com/julienschmidt/httprouter"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -14,17 +13,19 @@ func (app *application) showBeerHandler(w http.ResponseWriter, r *http.Request) 
 
 	beer, err := app.BeerModel.Get(id)
 	if err != nil {
-		log.Fatal(err)
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			app.notFoundResponse(w, r)
+		default:
+			app.serverErrorResponse(w, r, err)
+		}
+		return
 	}
 
-	body, err := json.Marshal(beer)
+	err = app.writeJSON(w, http.StatusOK, beer, nil)
 	if err != nil {
-		log.Fatal(err)
+		app.serverErrorResponse(w, r, err)
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(body)
 }
 
 func (app *application) readIDParam(r *http.Request) (int64, error) {
